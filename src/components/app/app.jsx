@@ -8,7 +8,7 @@ import SearchInfo from '../searchInfo/searchInfo';
 import api from '../utils/api';
 
 function App() {
-  const [cards, setCards] = useState(data);
+  const [cards, setCards] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -27,9 +27,18 @@ function App() {
   }, [searchQuery]);
 
   useEffect(() => {
-    api.getProductsList().then((data) => setCards(data.products));
     api.getUserInfo().then((userData)=>setCurrentUser(userData))
   }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      api.search('').then((data) => {
+        const myCards = data.filter((card) => card.author._id === currentUser._id);
+
+        setCards(myCards);
+      })
+    }
+  }, [currentUser]);
 
   return (
     <>
